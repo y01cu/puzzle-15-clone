@@ -2,16 +2,30 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour
 {
+    public static TileManager Instance;
     public NumberTile[,] numberTileArray;
     [SerializeField] private NumberTile numberTilePrefab;
     [SerializeField] private Transform canvasParentTransform;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
     void Start()
     {
-        SpawnNumberTiles();
+        SpawnAndAdjustNumberTiles();
     }
 
-    private void SpawnNumberTiles()
+    private void SpawnAndAdjustNumberTiles()
     {
+        // Initiations of number tile and unique value arrays
         numberTileArray = new NumberTile[4, 4];
         int[] uniqueNumbers = new int[16];
 
@@ -20,6 +34,7 @@ public class TileManager : MonoBehaviour
             uniqueNumbers[i] = i;
         }
 
+        // Shuffling the unique numbers array
         for (int i = 0; i < uniqueNumbers.Length; i++)
         {
             int temp = uniqueNumbers[i];
@@ -28,6 +43,7 @@ public class TileManager : MonoBehaviour
             uniqueNumbers[randomIndex] = temp;
         }
 
+        // Spawning the number tiles with unique 
         int indexForUniqueNumbers = 0;
         for (int i = 0; i < 4; i++)
         {
@@ -35,13 +51,21 @@ public class TileManager : MonoBehaviour
             {
                 NumberTile numberTile = Instantiate(numberTilePrefab);
                 numberTile.transform.SetParent(canvasParentTransform);
-                numberTile.transform.localPosition = new Vector3(j * 100, i * 100, 0);
+                numberTile.transform.localPosition = new Vector3(i * 100, j * 100, 0);
                 numberTile.GetComponent<NumberTile>().rowValue = i;
                 numberTile.GetComponent<NumberTile>().columnValue = j;
                 numberTileArray[i, j] = numberTile.GetComponent<NumberTile>();
+                numberTileArray[i, j].rowValue = i;
+                numberTileArray[i, j].columnValue = j;
                 numberTileArray[i, j].number = uniqueNumbers[indexForUniqueNumbers];
                 indexForUniqueNumbers++;
+                if (numberTileArray[i, j].number == 0)
+                {
+                    Destroy(numberTileArray[i, j].gameObject);
+                    continue;
+                }
                 numberTileArray[i, j].SetUpNumberText();
+                numberTile.gameObject.name = $"NumberTile {numberTile.number}";
             }
         }
     }
