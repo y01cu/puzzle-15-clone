@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TileManager : MonoBehaviour
 {
@@ -61,11 +63,23 @@ public class TileManager : MonoBehaviour
                 indexForUniqueNumbers++;
                 if (numberTileArray[i, j].number == 0)
                 {
-                    Destroy(numberTileArray[i, j].gameObject);
+                    numberTileArray[i, j].GetComponent<Image>().enabled = false;
+                    numberTileArray[i, j].GetComponentInChildren<TextMeshProUGUI>().enabled = false;
                     continue;
                 }
                 numberTileArray[i, j].SetUpNumberText();
                 numberTile.gameObject.name = $"NumberTile {numberTile.number}";
+            }
+        }
+    }
+
+    public void LogArrayContent()
+    {
+        for (int i = 0; i < numberTileArray.GetLength(0); i++)
+        {
+            for (int j = 0; j < numberTileArray.GetLength(1); j++)
+            {
+                Debug.Log($"numberTileArray[{i},{j}]: {numberTileArray[i, j].number}");
             }
         }
     }
