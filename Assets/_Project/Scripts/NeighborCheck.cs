@@ -13,8 +13,8 @@ public class NeighborRelation : MonoBehaviour
 
         var arrayWidth = numberTileArray.GetLength(0) - 1;
         if (rowValue - 1 >= 0)
-        {
             leftNeighbor = numberTileArray[rowValue - 1, columnValue];
+        {
             Debug.Log($"left: {leftNeighbor.number}");
         }
         if (rowValue + 1 <= arrayWidth)

@@ -8,15 +8,8 @@ public class NumberTile : MonoBehaviour, IPointerDownHandler
     public int rowValue;
     public int columnValue;
     public int number;
-
-    private Rigidbody2D rigidbody2D;
     private bool isClickable = true;
 
-
-    private void Start()
-    {
-        rigidbody2D = GetComponent<Rigidbody2D>();
-    }
     public void SetUpNumberText()
     {
         GetComponentInChildren<TextMeshProUGUI>().text = number.ToString();
