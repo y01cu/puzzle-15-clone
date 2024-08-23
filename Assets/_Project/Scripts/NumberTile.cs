@@ -60,7 +60,7 @@ public class NumberTile : MonoBehaviour, IPointerDownHandler
         var rectTransform = GetComponent<RectTransform>();
         Vector3 tempPosition = rectTransform.position;
 
-        rectTransform.DOMove(emptyTile.GetComponent<RectTransform>().position, 0.2f);
+        rectTransform.DOMove(emptyTile.GetComponent<RectTransform>().position, 0.12f);
         emptyTile.GetComponent<RectTransform>().position = tempPosition;
 
         numberTileArray[rowValue, columnValue] = this;
