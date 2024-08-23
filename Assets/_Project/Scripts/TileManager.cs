@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +21,7 @@ public class TileManager : MonoBehaviour
             Destroy(this);
         }
     }
-    void Start()
+    private void Start()
     {
         SpawnAndAdjustNumberTiles();
     }
@@ -47,13 +48,16 @@ public class TileManager : MonoBehaviour
 
         // Spawning the number tiles with unique 
         int indexForUniqueNumbers = 0;
-        for (int i = 0; i < 4; i++)
+        int edgeTileCount = 4;
+
+        var edgeValue = Screen.width / edgeTileCount;
+        for (int i = 0; i < edgeTileCount; i++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < edgeTileCount; j++)
             {
                 NumberTile numberTile = Instantiate(numberTilePrefab);
                 numberTile.transform.SetParent(canvasParentTransform);
-                numberTile.transform.localPosition = new Vector3(i * 100, j * 100, 0);
+                numberTile.transform.localPosition = new Vector3(i * edgeValue - edgeTileCount / 2 * edgeValue + edgeValue / 2, j * edgeValue - edgeTileCount / 2 * edgeValue + edgeValue / 2, 0);
                 numberTile.GetComponent<NumberTile>().rowValue = i;
                 numberTile.GetComponent<NumberTile>().columnValue = j;
                 numberTileArray[i, j] = numberTile.GetComponent<NumberTile>();
@@ -65,21 +69,11 @@ public class TileManager : MonoBehaviour
                 {
                     numberTileArray[i, j].GetComponent<Image>().enabled = false;
                     numberTileArray[i, j].GetComponentInChildren<TextMeshProUGUI>().enabled = false;
+                    numberTile.gameObject.name = "Empty Tile";
                     continue;
                 }
                 numberTileArray[i, j].SetUpNumberText();
-                numberTile.gameObject.name = $"NumberTile {numberTile.number}";
-            }
-        }
-    }
-
-    public void LogArrayContent()
-    {
-        for (int i = 0; i < numberTileArray.GetLength(0); i++)
-        {
-            for (int j = 0; j < numberTileArray.GetLength(1); j++)
-            {
-                Debug.Log($"numberTileArray[{i},{j}]: {numberTileArray[i, j].number}");
+                numberTile.gameObject.name = $"Number Tile {numberTile.number}";
             }
         }
     }

@@ -2,47 +2,74 @@ using UnityEngine;
 
 public class NeighborRelation : MonoBehaviour
 {
-    public static NumberTile ReturnEmptyCellIfPossible(int rowValue, int columnValue)
+    private NumberTile leftNeighbor;
+    private NumberTile rightNeighbor;
+    private NumberTile topNeighbor;
+    private NumberTile bottomNeighbor;
+    public NumberTile ReturnEmptyCellIfPossible(int rowValue, int columnValue)
     {
+        leftNeighbor = new();
+        rightNeighbor = new();
+        topNeighbor = new();
+        bottomNeighbor = new();
+
         var numberTileArray = TileManager.Instance.numberTileArray;
 
-        NumberTile leftNeighbor = new NumberTile();
-        NumberTile rightNeighbor = new NumberTile();
-        NumberTile topNeighbor = new NumberTile();
-        NumberTile bottomNeighbor = new NumberTile();
 
         var arrayWidth = numberTileArray.GetLength(0) - 1;
         if (rowValue - 1 >= 0)
-            leftNeighbor = numberTileArray[rowValue - 1, columnValue];
         {
-            Debug.Log($"left: {leftNeighbor.number}");
+            leftNeighbor = ProcessGivenValuesAndGetEmptyIfPossible(rowValue - 1, columnValue, true, -1);
         }
         if (rowValue + 1 <= arrayWidth)
         {
-            rightNeighbor = numberTileArray[rowValue + 1, columnValue];
-            Debug.Log($"right: {rightNeighbor.number}");
+            rightNeighbor = ProcessGivenValuesAndGetEmptyIfPossible(rowValue + 1, columnValue, true, 1);
         }
         if (columnValue + 1 <= arrayWidth)
         {
-            topNeighbor = numberTileArray[rowValue, columnValue + 1];
-            Debug.Log($"top: {topNeighbor.number}");
+            topNeighbor = ProcessGivenValuesAndGetEmptyIfPossible(rowValue, columnValue + 1, false, 1);
         }
         if (columnValue - 1 >= 0)
         {
-            bottomNeighbor = numberTileArray[rowValue, columnValue - 1];
-            Debug.Log($"bottom: {bottomNeighbor.number}");
+            bottomNeighbor = ProcessGivenValuesAndGetEmptyIfPossible(rowValue, columnValue - 1, false, -1);
         }
         NumberTile[] neighbors = new NumberTile[] { leftNeighbor, rightNeighbor, topNeighbor, bottomNeighbor };
         for (int i = 0; i < neighbors.Length; i++)
         {
-
-            if (neighbors[i].number == 0 && neighbors[i] != null)
+            if (neighbors[i] != null && neighbors[i].number == 0)
             {
-                Debug.Log("empty cell is found and returning");
                 return neighbors[i];
             }
         }
-        Debug.Log("empty cell is not found");
         return null;
     }
+
+    private NumberTile ProcessGivenValuesAndGetEmptyIfPossible(int rowValue, int columnValue, bool isItRow, int operation)
+    {
+        var numberTileArray = TileManager.Instance.numberTileArray;
+        var arrayWidth = numberTileArray.GetLength(0) - 1;
+
+        if (numberTileArray[rowValue, columnValue].number == 0)
+        {
+            return numberTileArray[rowValue, columnValue];
+        }
+
+        if (isItRow)
+        {
+            if (arrayWidth <= rowValue + operation || rowValue + operation < 0)
+            {
+                return null;
+            }
+            return ProcessGivenValuesAndGetEmptyIfPossible(rowValue + operation, columnValue, isItRow, operation);
+        }
+        else
+        {
+            if (arrayWidth <= columnValue + operation || columnValue + operation < 0)
+            {
+                return null;
+            }
+            return ProcessGivenValuesAndGetEmptyIfPossible(rowValue, columnValue + operation, isItRow, operation);
+        }
+    }
+
 }

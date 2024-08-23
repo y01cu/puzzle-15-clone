@@ -5,26 +5,47 @@ using DG.Tweening;
 
 public class NumberTile : MonoBehaviour, IPointerDownHandler
 {
+    private EmptyTileSearch emptyTileSearch = new();
     public int rowValue;
     public int columnValue;
     public int number;
-    private bool isClickable = true;
+    public int edgeValue;
 
+    private void Start()
+    {
+        edgeValue = Screen.width / 4;
+        var rectTransform = GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(edgeValue, edgeValue);
+    }
     public void SetUpNumberText()
     {
         GetComponentInChildren<TextMeshProUGUI>().text = number.ToString();
     }
 
-    private void MoveTileToEmptyArea(NumberTile emptyTile)
+    public void MoveTileToEmptyArea(NumberTile emptyTile)
     {
-        Debug.Log($"empty tile {emptyTile}");
+        var numberTileArray = TileManager.Instance.numberTileArray;
         if (emptyTile == null)
         {
             Debug.Log("empty tile is null");
             return;
         }
+        int rowDifference = rowValue - emptyTile.rowValue > 0 ? 1 : -1;
+        int columnDifference = columnValue - emptyTile.columnValue > 0 ? 1 : -1;
 
-        isClickable = false;
+        if (Mathf.Abs(rowDifference) > 1)
+        {
+            numberTileArray[rowValue + rowDifference, columnValue].MoveTileToEmptyArea(emptyTile);
+            var newEmptyTile = numberTileArray[rowValue + rowDifference, columnValue];
+            MoveTileToEmptyArea(newEmptyTile);
+        }
+        else if (Mathf.Abs(columnDifference) > 1)
+        {
+            numberTileArray[rowValue, columnValue + columnDifference].MoveTileToEmptyArea(emptyTile);
+            var newEmptyTile = numberTileArray[rowValue, columnValue + columnDifference];
+            MoveTileToEmptyArea(newEmptyTile);
+        }
+
         int tempRowValue = emptyTile.rowValue;
         int tempColumnValue = emptyTile.columnValue;
 
@@ -37,19 +58,64 @@ public class NumberTile : MonoBehaviour, IPointerDownHandler
         var rectTransform = GetComponent<RectTransform>();
         Vector3 tempPosition = rectTransform.position;
 
-        rectTransform.DOMove(emptyTile.GetComponent<RectTransform>().position, 0.2f).onComplete += () => isClickable = true;
+        rectTransform.DOMove(emptyTile.GetComponent<RectTransform>().position, 0.2f);
         emptyTile.GetComponent<RectTransform>().position = tempPosition;
 
-        var numberTileArray = TileManager.Instance.numberTileArray;
         numberTileArray[rowValue, columnValue] = this;
         numberTileArray[emptyTile.rowValue, emptyTile.columnValue] = emptyTile;
         emptyTile.number = 0;
-
-        Debug.Log("new setup");
-        TileManager.Instance.LogArrayContent();
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        MoveTileToEmptyArea(NeighborRelation.ReturnEmptyCellIfPossible(rowValue, columnValue));
+        UpdateTiles();
+    }
+
+    private void UpdateTiles()
+    {
+        var numberTileArray = TileManager.Instance.numberTileArray;
+        var foundEmptyTile = emptyTileSearch.TryFinding(this);
+        if (foundEmptyTile == null)
+        {
+            Debug.Log("empty tile is not found");
+            return;
+        }
+
+        int rowDifference = rowValue - foundEmptyTile.rowValue > 0 ? 1 : -1;
+        int columnDifference = columnValue - foundEmptyTile.columnValue > 0 ? 1 : -1;
+
+        if (rowValue - foundEmptyTile.rowValue != 0)
+        {
+            if (rowDifference > 0)
+            {
+                while (foundEmptyTile.rowValue <= rowValue)
+                {
+                    numberTileArray[foundEmptyTile.rowValue + 1, columnValue].MoveTileToEmptyArea(foundEmptyTile);
+                }
+            }
+            else
+            {
+                while (foundEmptyTile.rowValue >= rowValue)
+                {
+                    numberTileArray[foundEmptyTile.rowValue - 1, columnValue].MoveTileToEmptyArea(foundEmptyTile);
+                }
+            }
+        }
+        if (columnValue - foundEmptyTile.columnValue != 0)
+        {
+            if (columnDifference > 0)
+            {
+                while (foundEmptyTile.columnValue <= columnValue)
+                {
+                    numberTileArray[rowValue, foundEmptyTile.columnValue + 1].MoveTileToEmptyArea(foundEmptyTile);
+                }
+            }
+            else
+            {
+                while (foundEmptyTile.columnValue >= columnValue)
+                {
+                    numberTileArray[rowValue, foundEmptyTile.columnValue - 1].MoveTileToEmptyArea(foundEmptyTile);
+                }
+            }
+        }
     }
 }
