@@ -74,6 +74,9 @@ crashlytics-build.properties
 # TMP
 /[Aa]ssets/[Tt]extMesh Pro
 
+# APK
+/APK
+
 # Kubacho Lab assets
 /[Aa]ssets/VFavorites*
 /[Aa]ssets/VFolders*
