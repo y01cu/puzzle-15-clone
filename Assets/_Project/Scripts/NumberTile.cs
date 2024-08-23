@@ -2,9 +2,11 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using System;
 
 public class NumberTile : MonoBehaviour, IPointerDownHandler
 {
+    public static event EventHandler OnTileMoved;
     private EmptyTileSearch emptyTileSearch = new();
     public int rowValue;
     public int columnValue;
@@ -64,6 +66,7 @@ public class NumberTile : MonoBehaviour, IPointerDownHandler
         numberTileArray[rowValue, columnValue] = this;
         numberTileArray[emptyTile.rowValue, emptyTile.columnValue] = emptyTile;
         emptyTile.number = 0;
+        OnTileMoved?.Invoke(this, EventArgs.Empty);
     }
     public void OnPointerDown(PointerEventData eventData)
     {

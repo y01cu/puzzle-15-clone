@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -12,13 +10,22 @@ public class GameStatistics : MonoBehaviour
     private int moveCounter;
     private float timeCounter;
 
+
     private void Start()
     {
+        NumberTile.OnTileMoved += UpdateMoveCounterAndItsText;
+        MovesValueText.text = "0";
+    }
+
+    private void UpdateMoveCounterAndItsText(object sender, EventArgs e)
+    {
+        moveCounter++;
+        MovesValueText.text = moveCounter.ToString();
     }
 
     private void Update()
     {
         timeCounter += Time.deltaTime;
-        TimeValueText.text = $"{timeCounter.ToString("F1")}";
+        TimeValueText.text = $"{(int)timeCounter / 60}:{timeCounter.ToString("F1")}";
     }
 }
